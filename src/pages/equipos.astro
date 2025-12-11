@@ -1,0 +1,9 @@
+---
+// src/pages/equipos.astro
+import MainLayout from "../components/layout/MainLayout.astro";
+import TeamsExplorer from "../components/teams/TeamsExplorer.tsx";
+---
+
+<MainLayout title="Selecciones – Mundial 2026">
+  <TeamsExplorer client:load />
+</MainLayout>

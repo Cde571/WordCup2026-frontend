@@ -1,0 +1,31 @@
+---
+import WorldCupCountdown from "./WorldCupCountdown.tsx";
+---
+
+<section class="flex flex-col md:flex-row items-center justify-between gap-6">
+  <div>
+    <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg">
+      MUNDIAL 2026
+    </h1>
+    <p class="mt-3 text-slate-300 max-w-xl">
+      Haz tus predicciones de grupos, llaves, campeón y goleadores. Compite con tus
+      amigos durante todo el Mundial.
+    </p>
+    <div class="mt-5 flex gap-3">
+      <a
+        href="/grupos"
+        class="px-4 py-2 rounded-lg bg-yellow-400 text-slate-900 font-semibold text-sm"
+      >
+        Empezar predicciones
+      </a>
+      <a
+        href="/ranking"
+        class="px-4 py-2 rounded-lg border border-slate-500 text-sm text-slate-100"
+      >
+        Ver ranking
+      </a>
+    </div>
+  </div>
+
+  <WorldCupCountdown client:load />
+</section>

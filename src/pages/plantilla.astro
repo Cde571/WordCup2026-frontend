@@ -1,0 +1,10 @@
+---
+import MainLayout from "../components/layout/MainLayout.astro";
+import TeamSquadViewer from "../components/teams/TeamSquadViewer.tsx";
+---
+
+<MainLayout title="Plantilla de la selección – Mundial 2026">
+  <section class="mt-4">
+    <TeamSquadViewer client:only="react" />
+  </section>
+</MainLayout>

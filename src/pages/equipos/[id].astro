@@ -1,0 +1,14 @@
+---
+// src/pages/equipos/[id].astro
+import MainLayout from "../../components/layout/MainLayout.astro";
+import TeamDetail from "../../components/teams/TeamDetail.tsx";
+
+const { id } = Astro.params;
+if (!id) {
+  throw new Error("Falta el parámetro 'id' en la ruta /equipos/[id]");
+}
+---
+
+<MainLayout title="Detalle de selección – Mundial 2026">
+  <TeamDetail teamId={id} client:load />
+</MainLayout>

@@ -1,0 +1,31 @@
+---
+import MainLayout from "../components/layout/MainLayout.astro";
+import ProfileClient from "../components/profile/ProfileClient.tsx";
+
+// URL base del backend (configurable por env de Astro)
+// En tu .env de Astro puedes definir: PUBLIC_API_BASE_URL=http://localhost:4000
+const API_BASE =
+  import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+---
+
+<MainLayout title="Mi perfil – Mundial 2026">
+  <section class="mt-6 max-w-6xl mx-auto space-y-8">
+    <!-- Título general de la página -->
+    <header class="border-b border-slate-800 pb-4 mb-2">
+      <p class="text-[11px] uppercase tracking-[0.18em] text-sky-300 mb-1">
+        Panel personal
+      </p>
+      <h1 class="font-bebas text-3xl md:text-4xl text-white tracking-[0.22em]">
+        Perfil &amp; Progreso
+      </h1>
+      <p class="text-xs md:text-sm text-slate-300 max-w-2xl mt-1">
+        Inicia sesión con Google para que todas tus predicciones del Mundial 2026
+        queden guardadas, se calculen tus puntos automáticamente y puedas seguir
+        tu ranking desde cualquier dispositivo.
+      </p>
+    </header>
+
+    <!-- Componente React que maneja el estado de autenticación y los datos del usuario -->
+    <ProfileClient client:only="react" apiBase={API_BASE} />
+  </section>
+</MainLayout>

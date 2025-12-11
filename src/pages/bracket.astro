@@ -1,0 +1,10 @@
+---
+import MainLayout from "../components/layout/MainLayout.astro";
+import KnockoutBracketPredictions from "../components/bracket/KnockoutBracketPredictions.tsx";
+---
+
+<MainLayout title="Bracket – Mundial 2026">
+  <section class="max-w-6xl mx-auto mt-4">
+    <KnockoutBracketPredictions client:load />
+  </section>
+</MainLayout>

@@ -1,16 +1,182 @@
 ---
-
+import MainLayout from "../components/layout/MainLayout.astro";
+import HeroBanner from "../components/home/HeroBanner.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<MainLayout title="Mundial 2026 – Predicciones y Brackets">
+  <!-- HERO PRINCIPAL CON CONTADOR -->
+  <HeroBanner />
+
+  <!-- SECCIÓN RESUMEN DE LA EXPERIENCIA -->
+  <section class="mt-10">
+    <h2 class="text-xl md:text-2xl font-semibold text-white mb-4">
+      Vive el Mundial como un analista de élite
+    </h2>
+
+    <div class="grid gap-4 md:grid-cols-3">
+      <article class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4 flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-semibold text-white mb-2">
+            Predicciones de fase de grupos
+          </h3>
+          <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+            Define quién será 1.º, 2.º y 3.º en cada grupo. Tus elecciones
+            marcarán el camino de los cruces hacia la fase eliminatoria.
+          </p>
+        </div>
+        <a
+          href="/grupos"
+          class="inline-flex items-center text-xs font-semibold text-yellow-300 hover:text-yellow-200"
+        >
+          Ir a predicciones de grupos →
+        </a>
+      </article>
+
+      <article class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4 flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-semibold text-white mb-2">
+            Bracket de eliminatorias
+          </h3>
+          <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+            Construye tu llave desde 16avos hasta la gran final: elige ganadores,
+            sorpresas, semifinalistas, campeón y tercer puesto.
+          </p>
+        </div>
+        <a
+          href="/bracket"
+          class="inline-flex items-center text-xs font-semibold text-yellow-300 hover:text-yellow-200"
+        >
+          Ver bracket interactivo →
+        </a>
+      </article>
+
+      <article class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4 flex flex-col justify-between">
+        <div>
+          <h3 class="text-sm font-semibold text-white mb-2">
+            Puntos, ranking y gamificación
+          </h3>
+          <p class="text-xs text-slate-300 mb-3 leading-relaxed">
+            Suma puntos por cada acierto, sube posiciones en el ranking global
+            y compite en mini-ligas con tus amigos. Desbloquea insignias
+            especiales a medida que avance el torneo.
+          </p>
+        </div>
+        <a
+          href="/ranking"
+          class="inline-flex items-center text-xs font-semibold text-yellow-300 hover:text-yellow-200"
+        >
+          Consultar ranking →
+        </a>
+      </article>
+    </div>
+  </section>
+
+  <!-- SECCIÓN ACCESO RÁPIDO A PARTIDOS Y EQUIPOS -->
+  <section class="mt-10 grid gap-6 md:grid-cols-[1.3fr,1fr]">
+    <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-5 h-full flex flex-col justify-between">
+      <div>
+        <h2 class="text-sm md:text-base font-semibold text-white mb-2">
+          Predice partido a partido
+        </h2>
+        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+          Recorre el calendario completo del Mundial, revisa qué partidos ya
+          tienen pronóstico y cuáles te faltan por completar. Ajusta tus
+          predicciones antes de cada jornada según el rendimiento real
+          de las selecciones.
+        </p>
+      </div>
+      <a
+        href="/partidos"
+        class="inline-flex items-center text-xs font-semibold text-yellow-300 hover:text-yellow-200"
+      >
+        Ver calendario de partidos →
+      </a>
+    </div>
+
+    <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-5 h-full flex flex-col justify-between">
+      <div>
+        <h2 class="text-sm md:text-base font-semibold text-white mb-2">
+          Explora selecciones y plantillas
+        </h2>
+        <p class="text-xs text-slate-300 mb-4 leading-relaxed">
+          Consulta todas las selecciones clasificadas, sus jugadores clave,
+          datos básicos y partidos del Mundial. La información que necesitas
+          antes de confirmar tus pronósticos.
+        </p>
+      </div>
+      <a
+        href="/equipos"
+        class="inline-flex items-center text-xs font-semibold text-yellow-300 hover:text-yellow-200"
+      >
+        Ir a selecciones →
+      </a>
+    </div>
+  </section>
+
+  <!-- SECCIÓN MINI RESUMEN ESTADO DEL USUARIO (LUEGO SE CONECTA A BACKEND) -->
+  <section class="mt-10 grid gap-4 md:grid-cols-3">
+    <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4">
+      <h3 class="text-xs font-semibold text-slate-200 mb-2">
+        Estado de tus predicciones
+      </h3>
+      <p class="text-[11px] text-slate-300 mb-3 leading-relaxed">
+        Muy pronto verás aquí cuántos partidos, grupos y llaves tienes
+        pronosticados y cuáles están pendientes.
+      </p>
+      <div class="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+        <div class="h-full w-1/3 bg-yellow-400"></div>
+      </div>
+      <p class="mt-2 text-[11px] text-slate-400">
+        Progreso estimado: 30% (ejemplo)
+      </p>
+    </div>
+
+    <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4">
+      <h3 class="text-xs font-semibold text-slate-200 mb-2">
+        Próximas funcionalidades
+      </h3>
+      <ul class="space-y-1.5 text-[11px] text-slate-300">
+        <li>• Mini-ligas privadas con tus amigos.</li>
+        <li>• Insignias por rachas de aciertos.</li>
+        <li>• Estadísticas avanzadas por selección y jugador.</li>
+      </ul>
+    </div>
+
+    <div class="rounded-2xl bg-gradient-to-br from-yellow-500/20 via-emerald-500/15 to-sky-500/20 border border-yellow-400/40 p-4">
+      <h3 class="text-xs font-semibold text-white mb-2">
+        Conecta tu cuenta
+      </h3>
+      <p class="text-[11px] text-slate-100/90 mb-3 leading-relaxed">
+        Pronto podrás iniciar sesión con Google para guardar tus predicciones,
+        puntos y ranking personal entre dispositivos.
+      </p>
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg bg-yellow-400 text-slate-900 text-xs font-semibold cursor-not-allowed opacity-80"
+      >
+        Iniciar sesión con Google (muy pronto)
+      </button>
+    </div>
+  </section>
+
+  <!-- CTA FINAL HACIA PERFIL -->
+  <section class="mt-10 mb-6">
+    <div class="rounded-2xl bg-gradient-to-r from-yellow-500/20 via-emerald-500/10 to-sky-500/20 border border-yellow-400/40 px-5 py-4 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div>
+        <h2 class="text-sm font-semibold text-white mb-1">
+          Revisa tu progreso y tus puntos
+        </h2>
+        <p class="text-xs text-slate-100/80 max-w-md leading-relaxed">
+          Desde tu perfil podrás ver tus puntos acumulados, tus insignias
+          y el estado de tus predicciones en grupos, bracket y partidos.
+        </p>
+      </div>
+      <a
+        href="/perfil"
+        class="px-4 py-2 rounded-lg bg-yellow-400 text-slate-900 text-xs font-semibold"
+      >
+        Ir a mi perfil
+      </a>
+    </div>
+  </section>
+</MainLayout>
