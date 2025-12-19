@@ -5,7 +5,8 @@ import vercel from "@astrojs/vercel/serverless";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  output: "server",
+  output: "server"
+  , adapter: vercel(),
   
   integrations: [react()],
   vite: {
