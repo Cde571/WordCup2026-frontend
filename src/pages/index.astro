@@ -1,6 +1,8 @@
 ---
 import MainLayout from "../components/layout/MainLayout.astro";
 import HeroBanner from "../components/home/HeroBanner.astro";
+
+const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 ---
 
 <MainLayout title="Mundial 2026 – Predicciones y Brackets">
@@ -113,24 +115,32 @@ import HeroBanner from "../components/home/HeroBanner.astro";
     </div>
   </section>
 
-  <!-- SECCIÓN MINI RESUMEN ESTADO DEL USUARIO (LUEGO SE CONECTA A BACKEND) -->
+  <!-- SECCIÓN MINI RESUMEN ESTADO DEL USUARIO (CONECTADO A BACKEND) -->
   <section class="mt-10 grid gap-4 md:grid-cols-3">
+    <!-- Estado -->
     <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4">
       <h3 class="text-xs font-semibold text-slate-200 mb-2">
         Estado de tus predicciones
       </h3>
-      <p class="text-[11px] text-slate-300 mb-3 leading-relaxed">
-        Muy pronto verás aquí cuántos partidos, grupos y llaves tienes
-        pronosticados y cuáles están pendientes.
+
+      <p id="predStatusText" class="text-[11px] text-slate-300 mb-3 leading-relaxed">
+        Cargando tu progreso...
       </p>
+
       <div class="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
-        <div class="h-full w-1/3 bg-yellow-400"></div>
+        <div id="predProgressBar" class="h-full w-[0%] bg-yellow-400"></div>
       </div>
-      <p class="mt-2 text-[11px] text-slate-400">
-        Progreso estimado: 30% (ejemplo)
+
+      <p id="predProgressLabel" class="mt-2 text-[11px] text-slate-400">
+        Progreso: 0%
+      </p>
+
+      <p id="predPoints" class="mt-2 text-[11px] text-slate-300">
+        Puntos: —
       </p>
     </div>
 
+    <!-- Próximas -->
     <div class="rounded-2xl bg-slate-900/70 border border-slate-800 p-4">
       <h3 class="text-xs font-semibold text-slate-200 mb-2">
         Próximas funcionalidades
@@ -142,19 +152,38 @@ import HeroBanner from "../components/home/HeroBanner.astro";
       </ul>
     </div>
 
+    <!-- Login -->
     <div class="rounded-2xl bg-gradient-to-br from-yellow-500/20 via-emerald-500/15 to-sky-500/20 border border-yellow-400/40 p-4">
       <h3 class="text-xs font-semibold text-white mb-2">
         Conecta tu cuenta
       </h3>
-      <p class="text-[11px] text-slate-100/90 mb-3 leading-relaxed">
-        Pronto podrás iniciar sesión con Google para guardar tus predicciones,
-        puntos y ranking personal entre dispositivos.
+
+      <p id="authText" class="text-[11px] text-slate-100/90 mb-3 leading-relaxed">
+        Cargando estado de sesión...
       </p>
-      <button
-        type="button"
-        class="px-4 py-2 rounded-lg bg-yellow-400 text-slate-900 text-xs font-semibold cursor-not-allowed opacity-80"
+
+      <a
+        id="googleLoginLink"
+        href={`${BACKEND_URL}/auth/google`}
+        class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-yellow-400 text-slate-900 text-xs font-semibold"
       >
-        Iniciar sesión con Google (muy pronto)
+        Iniciar sesión con Google
+      </a>
+
+      <a
+        id="profileLink"
+        href="/perfil"
+        class="hidden mt-2 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-900/70 border border-slate-700 text-slate-100 text-xs font-semibold"
+      >
+        Ir a mi perfil
+      </a>
+
+      <button
+        id="logoutBtn"
+        type="button"
+        class="hidden mt-2 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-slate-900/70 border border-slate-700 text-slate-100 text-xs font-semibold"
+      >
+        Cerrar sesión
       </button>
     </div>
   </section>
@@ -179,4 +208,106 @@ import HeroBanner from "../components/home/HeroBanner.astro";
       </a>
     </div>
   </section>
+
+  <!-- Script: conecta con backend -->
+  <script define:vars={{ BACKEND_URL }}>
+    const $ = (id) => document.getElementById(id);
+
+    async function fetchJSON(url, opts = {}) {
+      const res = await fetch(url, {
+        credentials: "include",
+        ...opts,
+      });
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`HTTP ${res.status} ${text}`.trim());
+      }
+      return res.json();
+    }
+
+    function setProgress(percent) {
+      const safe = Math.max(0, Math.min(100, percent));
+      $("predProgressBar").style.width = `${safe}%`;
+      $("predProgressLabel").textContent = `Progreso: ${safe}%`;
+    }
+
+    function setLoggedOutUI() {
+      $("authText").textContent = "Inicia sesión con Google para guardar y ver tus predicciones.";
+      $("googleLoginLink").classList.remove("hidden");
+      $("profileLink").classList.add("hidden");
+      $("logoutBtn").classList.add("hidden");
+
+      $("predStatusText").textContent = "Inicia sesión para ver tu progreso y puntos.";
+      $("predPoints").textContent = "Puntos: —";
+      setProgress(0);
+    }
+
+    function setLoggedInUI(u) {
+      $("authText").textContent = `Sesión activa: ${u.username} (${u.email})`;
+      $("googleLoginLink").classList.add("hidden");
+      $("profileLink").classList.remove("hidden");
+      $("logoutBtn").classList.remove("hidden");
+    }
+
+    function computeProgress(summary) {
+      const groupsTotal = summary?.predictions?.groups?.total ?? 12;
+      const groupsCompleted = summary?.predictions?.groups?.completed ?? 0;
+
+      const matchesPredCount = summary?.predictions?.matches?.total ?? 0;
+
+      // Estimación: 60% grupos + 40% partidos (solo si hay al menos 1 predicción)
+      const groupsPct = groupsTotal > 0 ? (groupsCompleted / groupsTotal) * 60 : 0;
+      const matchesPct = matchesPredCount > 0 ? 40 : 0;
+
+      return Math.round(groupsPct + matchesPct);
+    }
+
+    async function loadHomeData() {
+      setLoggedOutUI();
+
+      try {
+        const auth = await fetchJSON(`${BACKEND_URL}/auth/status`);
+        if (!auth?.loggedIn) return;
+
+        const u = auth.user;
+        setLoggedInUI(u);
+
+        const summary = await fetchJSON(`${BACKEND_URL}/api/predictions/summary`);
+
+        const groupsTotal = summary?.predictions?.groups?.total ?? 12;
+        const groupsCompleted = summary?.predictions?.groups?.completed ?? 0;
+        const matchesPredCount = summary?.predictions?.matches?.total ?? 0;
+
+        $("predStatusText").textContent =
+          `Grupos completados: ${groupsCompleted}/${groupsTotal}. ` +
+          `Predicciones de partidos: ${matchesPredCount}.`;
+
+        const progress = computeProgress(summary);
+        setProgress(progress);
+
+        const pts = summary?.user?.totalPoints ?? u.totalPoints ?? 0;
+        $("predPoints").textContent = `Puntos: ${pts}`;
+
+        $("logoutBtn").onclick = async () => {
+          try {
+            await fetchJSON(`${BACKEND_URL}/logout`, { method: "POST" });
+          } catch (e) {
+            console.error("Logout error:", e);
+          } finally {
+            // Refresca UI local
+            setLoggedOutUI();
+          }
+        };
+      } catch (err) {
+        console.error("Home backend error:", err);
+        $("authText").textContent =
+          "No se pudo conectar con el backend. Revisa que esté corriendo en " + BACKEND_URL;
+        $("predStatusText").textContent =
+          "No se pudo cargar tu progreso (backend offline, cookies o CORS).";
+        setProgress(0);
+      }
+    }
+
+    loadHomeData();
+  </script>
 </MainLayout>

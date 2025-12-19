@@ -1,25 +1,75 @@
 ---
 import MainLayout from "../components/layout/MainLayout.astro";
 
-const API_BASE =
-  import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:4000";
+const API_BASE = import.meta.env.PUBLIC_BACKEND_URL ?? "http://localhost:4000";
 
 // Filtros por query string (?phase=...&status=...)
 const phaseFilter = Astro.url.searchParams.get("phase") ?? "all";
 const statusFilter = Astro.url.searchParams.get("status") ?? "all";
 
-// Llamada al backend para traer los partidos
-let matches = [];
-let error = null;
+// ===============================
+// FLAGS (mismo criterio del React)
+// ===============================
+const FIFA_TO_ISO2: Record<string, string> = {
+  ALG: "dz", ARG: "ar", AUS: "au", AUT: "at", BEL: "be", BRA: "br",
+  CMR: "cm", CAN: "ca", CPV: "cv", COL: "co", CRO: "hr", CUW: "cw",
+  ECU: "ec", EGY: "eg", ENG: "gb-eng", FRA: "fr", GER: "de", HAI: "ht",
+  IRN: "ir", CIV: "ci", JPN: "jp", JOR: "jo", MEX: "mx", MAR: "ma",
+  NED: "nl", NZL: "nz", NGA: "ng", NOR: "no", PAN: "pa", PAR: "py",
+  POR: "pt", QAT: "qa", KSA: "sa", SCO: "gb-sct", SEN: "sn", KOR: "kr",
+  ESP: "es", SUI: "ch", USA: "us", URU: "uy", UZB: "uz", RSA: "za", TUN: "tn",
+};
+
+// prioriza logo del backend; si no, usa flagpedia por code
+function getFlagUrl(team: { code?: string; logo?: string | null } | null | undefined): string | null {
+  if (!team) return null;
+  if (team.logo) return team.logo;
+
+  const code = team.code?.toUpperCase();
+  if (!code) return null;
+
+  const iso2 = FIFA_TO_ISO2[code];
+  return iso2 ? `https://flagpedia.net/data/flags/w40/${iso2}.png` : null;
+}
+
+// ===============================
+// Helpers de navegación (filtros)
+// ===============================
+function buildHref(next: { phase?: string; status?: string }) {
+  const url = new URL(Astro.url.pathname, Astro.url.origin);
+
+  // conservar lo actual
+  if (phaseFilter !== "all") url.searchParams.set("phase", phaseFilter);
+  if (statusFilter !== "all") url.searchParams.set("status", statusFilter);
+
+  // aplicar cambios
+  if (next.phase !== undefined) {
+    if (next.phase === "all") url.searchParams.delete("phase");
+    else url.searchParams.set("phase", next.phase);
+  }
+  if (next.status !== undefined) {
+    if (next.status === "all") url.searchParams.delete("status");
+    else url.searchParams.set("status", next.status);
+  }
+
+  const qs = url.searchParams.toString();
+  return url.pathname + (qs ? `?${qs}` : "");
+}
+
+// ===============================
+// Fetch matches
+// ===============================
+let matches: any[] = [];
+let error: string | null = null;
 
 try {
-  const res = await fetch(`${API_BASE}/api/matches`);
+  const res = await fetch(`${API_BASE}/api/matches`, { credentials: "include" });
   if (!res.ok) throw new Error(`Error ${res.status}`);
   const data = await res.json();
   matches = data.matches ?? [];
-} catch (err) {
+} catch (err: any) {
   console.error("Error cargando partidos:", err);
-  error = err.message;
+  error = err?.message ?? "Error desconocido";
 }
 
 type Team = {
@@ -44,113 +94,96 @@ type Match = {
 
 const allMatches = matches as Match[];
 
-// Funciones auxiliares
+// Auxiliares
 function formatDate(dateStr: string) {
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return "Fecha por definir";
-  return d.toLocaleDateString("es-CO", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-  });
+  return d.toLocaleDateString("es-CO", { weekday: "short", day: "2-digit", month: "short" });
 }
 
 function formatTime(dateStr: string) {
   const d = new Date(dateStr);
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleTimeString("es-CO", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  return d.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false });
 }
 
 function shortPhase(phase: string) {
   switch (phase) {
-    case "Group Stage":
-      return "Fase de grupos";
-    case "Round of 32":
-      return "32avos";
-    case "Round of 16":
-      return "Octavos";
-    case "Quarter Finals":
-      return "Cuartos";
-    case "Semi Finals":
-      return "Semifinal";
-    case "Third Place":
-      return "Tercer puesto";
-    case "Final":
-      return "Final";
-    default:
-      return phase;
+    case "Group Stage": return "Fase de grupos";
+    case "Round of 32": return "32avos";
+    case "Round of 16": return "Octavos";
+    case "Quarter Finals": return "Cuartos";
+    case "Semi Finals": return "Semifinal";
+    case "Third Place": return "Tercer puesto";
+    case "Final": return "Final";
+    default: return phase;
   }
 }
 
 function statusLabel(status: string) {
   switch (status) {
-    case "Scheduled":
-      return "Programado";
-    case "Live":
-      return "En vivo";
-    case "Finished":
-      return "Finalizado";
-    case "Postponed":
-      return "Pospuesto";
-    case "Cancelled":
-      return "Cancelado";
-    default:
-      return status;
+    case "Scheduled": return "Programado";
+    case "Live": return "En vivo";
+    case "Finished": return "Finalizado";
+    case "Postponed": return "Pospuesto";
+    case "Cancelled": return "Cancelado";
+    default: return status;
   }
 }
 
 function statusBadgeClass(status: string) {
   switch (status) {
-    case "Live":
-      return "bg-red-500/10 border-red-500/60 text-red-300";
-    case "Finished":
-      return "bg-emerald-500/10 border-emerald-400/70 text-emerald-200";
-    case "Scheduled":
-      return "bg-slate-500/10 border-slate-500/60 text-slate-200";
-    case "Postponed":
-      return "bg-yellow-500/10 border-yellow-400/70 text-yellow-200";
-    case "Cancelled":
-      return "bg-rose-500/10 border-rose-400/70 text-rose-200";
-    default:
-      return "bg-slate-500/10 border-slate-500/60 text-slate-200";
+    case "Live": return "bg-red-500/10 border-red-500/60 text-red-300";
+    case "Finished": return "bg-emerald-500/10 border-emerald-400/70 text-emerald-200";
+    case "Scheduled": return "bg-slate-500/10 border-slate-500/60 text-slate-200";
+    case "Postponed": return "bg-yellow-500/10 border-yellow-400/70 text-yellow-200";
+    case "Cancelled": return "bg-rose-500/10 border-rose-400/70 text-rose-200";
+    default: return "bg-slate-500/10 border-slate-500/60 text-slate-200";
   }
 }
 
-// Aplicar filtros (fase, estado)
+function isRealTeam(t: any) {
+  return !!t && typeof t === "object" && !!t._id && !!t.name && t.name !== "Por definir";
+}
+
+// definidos (tienen home/away)
+const definedMatches = allMatches
+  .filter((m) => isRealTeam(m.homeTeam) && isRealTeam(m.awayTeam))
+  .sort((a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime());
+
+const definedByPhase = new Map<string, Match[]>();
+for (const m of definedMatches) {
+  const ph = m.phase || "Sin fase";
+  if (!definedByPhase.has(ph)) definedByPhase.set(ph, []);
+  definedByPhase.get(ph)!.push(m);
+}
+const definedPhases = Array.from(definedByPhase.keys());
+
+// filtros listados
 const filteredMatches = allMatches.filter((m) => {
   const phaseOk = phaseFilter === "all" || m.phase === phaseFilter;
   const statusOk = statusFilter === "all" || m.status === statusFilter;
   return phaseOk && statusOk;
 });
 
-// Agrupar por fecha (YYYY-MM-DD)
+// agrupar por día
 const groupedByDay = new Map<string, Match[]>();
-
 for (const match of filteredMatches) {
   const d = new Date(match.matchDate);
-  const key = Number.isNaN(d.getTime())
-    ? "Por definir"
-    : d.toISOString().slice(0, 10);
-
+  const key = Number.isNaN(d.getTime()) ? "Por definir" : d.toISOString().slice(0, 10);
   if (!groupedByDay.has(key)) groupedByDay.set(key, []);
   groupedByDay.get(key)!.push(match);
 }
 
-// Ordenar días
 const sortedDays = Array.from(groupedByDay.keys()).sort((a, b) => {
   if (a === "Por definir") return 1;
   if (b === "Por definir") return -1;
   return a.localeCompare(b);
 });
 
-// Estadísticas rápidas
+// Stats
 const totalMatches = allMatches.length;
 const totalScheduled = allMatches.filter((m) => m.status === "Scheduled").length;
-const totalLive = allMatches.filter((m) => m.status === "Live").length;
 const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
 ---
 
@@ -166,40 +199,122 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
           Partidos &amp; Predicciones
         </h1>
         <p class="text-xs md:text-sm text-slate-300 max-w-2xl mt-1">
-          Consulta todos los partidos del Mundial 2026: fechas, estadios y estado
-          del encuentro. Desde aquí podrás ir accediendo a tus predicciones
-          partido a partido.
+          Consulta todos los partidos del Mundial 2026: fechas, estadios y estado del encuentro.
         </p>
       </div>
 
-      <!-- RESUMEN RÁPIDO -->
       <div class="grid grid-cols-3 gap-2 text-center text-[11px]">
         <div class="rounded-xl bg-slate-900/80 border border-slate-700 px-3 py-2">
-          <p class="text-[10px] uppercase text-slate-400 tracking-[0.14em]">
-            Total
-          </p>
-          <p class="text-lg font-semibold text-slate-50">
-            {totalMatches}
-          </p>
+          <p class="text-[10px] uppercase text-slate-400 tracking-[0.14em]">Total</p>
+          <p class="text-lg font-semibold text-slate-50">{totalMatches}</p>
         </div>
         <div class="rounded-xl bg-slate-900/80 border border-emerald-500/60 px-3 py-2">
-          <p class="text-[10px] uppercase text-emerald-300 tracking-[0.14em]">
-            Finalizados
-          </p>
-          <p class="text-lg font-semibold text-emerald-200">
-            {totalFinished}
-          </p>
+          <p class="text-[10px] uppercase text-emerald-300 tracking-[0.14em]">Finalizados</p>
+          <p class="text-lg font-semibold text-emerald-200">{totalFinished}</p>
         </div>
         <div class="rounded-xl bg-slate-900/80 border border-sky-500/60 px-3 py-2">
-          <p class="text-[10px] uppercase text-sky-300 tracking-[0.14em]">
-            Programados
-          </p>
-          <p class="text-lg font-semibold text-sky-200">
-            {totalScheduled}
-          </p>
+          <p class="text-[10px] uppercase text-sky-300 tracking-[0.14em]">Programados</p>
+          <p class="text-lg font-semibold text-sky-200">{totalScheduled}</p>
         </div>
       </div>
     </header>
+
+    <!-- ENFRENTAMIENTOS DEFINIDOS -->
+    {!error && definedMatches.length > 0 && (
+      <section class="bg-slate-900/50 rounded-2xl border border-slate-800 p-4">
+        <div class="flex items-end justify-between gap-3 border-b border-slate-800 pb-3 mb-3">
+          <div>
+            <p class="text-[11px] uppercase tracking-[0.18em] text-yellow-300 mb-1">
+              Cruces ya definidos
+            </p>
+            <h2 class="text-sm md:text-base font-semibold text-white">
+              Enfrentamientos listos en el backend
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Estos son los partidos que ya tienen local y visitante asignados.
+            </p>
+          </div>
+          <span class="text-[11px] text-slate-400">
+            {definedMatches.length} {definedMatches.length === 1 ? "partido" : "partidos"}
+          </span>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+          {definedPhases.map((ph) => {
+            const list = definedByPhase.get(ph)!;
+
+            return (
+              <div class="rounded-2xl bg-slate-950/40 border border-slate-800 p-3">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-xs font-bold text-slate-100 uppercase tracking-[0.16em]">
+                    {shortPhase(ph)}
+                  </h3>
+                  <span class="text-[11px] text-slate-400">{list.length}</span>
+                </div>
+
+                <div class="space-y-2">
+                  {list.slice(0, 8).map((m) => (
+                    <div class="rounded-xl bg-slate-900/70 border border-slate-800 px-3 py-2">
+                      <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2 min-w-0">
+                          <!-- HOME FLAG -->
+                          <div class="w-7 h-5 rounded overflow-hidden border border-slate-700 bg-slate-800 flex-shrink-0">
+                            {getFlagUrl(m.homeTeam) ? (
+                              <img
+                                src={getFlagUrl(m.homeTeam)!}
+                                alt={m.homeTeam.code || m.homeTeam.name}
+                                class="w-full h-full object-cover"
+                                loading="lazy"
+                                onerror="this.style.display='none'"
+                              />
+                            ) : null}
+                          </div>
+
+                          <span class="text-[11px] font-semibold text-slate-200 truncate">{m.homeTeam.name}</span>
+                          <span class="text-[11px] text-slate-500">vs</span>
+
+                          <!-- AWAY FLAG -->
+                          <div class="w-7 h-5 rounded overflow-hidden border border-slate-700 bg-slate-800 flex-shrink-0">
+                            {getFlagUrl(m.awayTeam) ? (
+                              <img
+                                src={getFlagUrl(m.awayTeam)!}
+                                alt={m.awayTeam.code || m.awayTeam.name}
+                                class="w-full h-full object-cover"
+                                loading="lazy"
+                                onerror="this.style.display='none'"
+                              />
+                            ) : null}
+                          </div>
+
+                          <span class="text-[11px] font-semibold text-slate-200 truncate">{m.awayTeam.name}</span>
+                        </div>
+
+                        <div class="text-[11px] text-yellow-300 font-semibold whitespace-nowrap">
+                          {formatDate(m.matchDate)} {formatTime(m.matchDate)}
+                        </div>
+                      </div>
+
+                      <div class="mt-1 flex items-center justify-between text-[11px] text-slate-400">
+                        <span>{m.group ? `Grupo ${m.group} · ` : ""}{shortPhase(m.phase)}</span>
+                        <span class={`inline-flex items-center rounded-full border px-2 py-0.5 ${statusBadgeClass(m.status)}`}>
+                          {statusLabel(m.status)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+
+                  {list.length > 8 && (
+                    <p class="text-[11px] text-slate-400">
+                      Mostrando 8 de {list.length}. Usa filtros para ver más.
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    )}
 
     <!-- FILTROS -->
     <section class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-slate-900/50 rounded-2xl border border-slate-800 p-4">
@@ -209,66 +324,41 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
           Fase del torneo
         </span>
         <div class="flex flex-wrap gap-2">
-          <a
-            href="/partidos"
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              phaseFilter === "all"
-                ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Todas
-          </a>
-          <a
-            href="/partidos?phase=Group%20Stage"
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              phaseFilter === "Group Stage"
-                ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Fase de grupos
-          </a>
-          <a
-            href="/partidos?phase=Round%20of%2016"
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              phaseFilter === "Round of 16"
-                ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Octavos
-          </a>
-          <a
-            href="/partidos?phase=Quarter%20Finals"
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              phaseFilter === "Quarter Finals"
-                ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Cuartos
-          </a>
-          <a
-            href="/partidos?phase=Semi%20Finals"
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              phaseFilter === "Semi Finals"
-                ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Semifinal
-          </a>
-          <a
-            href="/partidos?phase=Final"
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              phaseFilter === "Final"
-                ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Final
-          </a>
+          <a href={buildHref({ phase: "all" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            phaseFilter === "all"
+              ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Todas</a>
+
+          <a href={buildHref({ phase: "Group Stage" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            phaseFilter === "Group Stage"
+              ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Fase de grupos</a>
+
+          <a href={buildHref({ phase: "Round of 16" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            phaseFilter === "Round of 16"
+              ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Octavos</a>
+
+          <a href={buildHref({ phase: "Quarter Finals" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            phaseFilter === "Quarter Finals"
+              ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Cuartos</a>
+
+          <a href={buildHref({ phase: "Semi Finals" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            phaseFilter === "Semi Finals"
+              ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Semifinal</a>
+
+          <a href={buildHref({ phase: "Final" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            phaseFilter === "Final"
+              ? "bg-yellow-400 text-slate-900 border-yellow-300 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Final</a>
         </div>
       </div>
 
@@ -278,46 +368,29 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
           Estado
         </span>
         <div class="flex flex-wrap gap-2">
-          <a
-            href={`/partidos${phaseFilter !== "all" ? `?phase=${encodeURIComponent(phaseFilter)}` : ""}`}
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              statusFilter === "all"
-                ? "bg-slate-700 text-slate-50 border-slate-500 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Todos
-          </a>
-          <a
-            href={`/partidos?${phaseFilter !== "all" ? `phase=${encodeURIComponent(phaseFilter)}&` : ""}status=Scheduled`}
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              statusFilter === "Scheduled"
-                ? "bg-sky-500 text-slate-900 border-sky-400 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Programados
-          </a>
-          <a
-            href={`/partidos?${phaseFilter !== "all" ? `phase=${encodeURIComponent(phaseFilter)}&` : ""}status=Live`}
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              statusFilter === "Live"
-                ? "bg-red-500 text-white border-red-400 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            En vivo
-          </a>
-          <a
-            href={`/partidos?${phaseFilter !== "all" ? `phase=${encodeURIComponent(phaseFilter)}&` : ""}status=Finished`}
-            class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
-              statusFilter === "Finished"
-                ? "bg-emerald-500 text-slate-900 border-emerald-400 shadow-lg"
-                : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
-            }`}
-          >
-            Finalizados
-          </a>
+          <a href={buildHref({ status: "all" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            statusFilter === "all"
+              ? "bg-slate-700 text-slate-50 border-slate-500 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Todos</a>
+
+          <a href={buildHref({ status: "Scheduled" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            statusFilter === "Scheduled"
+              ? "bg-sky-500 text-slate-900 border-sky-400 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Programados</a>
+
+          <a href={buildHref({ status: "Live" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            statusFilter === "Live"
+              ? "bg-red-500 text-white border-red-400 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>En vivo</a>
+
+          <a href={buildHref({ status: "Finished" })} class={`px-3 py-1.5 rounded-full text-[11px] font-medium border transition-all ${
+            statusFilter === "Finished"
+              ? "bg-emerald-500 text-slate-900 border-emerald-400 shadow-lg"
+              : "bg-slate-800 text-slate-200 border-slate-700 hover:border-slate-500 hover:bg-slate-700"
+          }`}>Finalizados</a>
         </div>
       </div>
     </section>
@@ -329,18 +402,12 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
       </div>
     ) : sortedDays.length === 0 ? (
       <div class="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 text-center">
-        <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-8 h-8 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
         <p class="text-slate-400">No hay partidos que coincidan con los filtros seleccionados.</p>
         <a href="/partidos" class="inline-block mt-4 px-4 py-2 bg-yellow-400 text-slate-900 rounded-xl text-sm font-semibold hover:bg-yellow-500 transition-colors">
           Ver todos los partidos
         </a>
       </div>
     ) : (
-      <!-- LISTADO DE PARTIDOS AGRUPADOS POR DÍA -->
       <section class="space-y-8">
         {sortedDays.map((dayKey) => {
           const dayMatches = groupedByDay.get(dayKey)!;
@@ -352,28 +419,38 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
           return (
             <div class="space-y-3">
               <div class="flex items-center gap-3 pb-2 border-b border-slate-800">
-                <h2 class="text-sm font-bebas tracking-[0.18em] text-white uppercase">
-                  {label}
-                </h2>
+                <h2 class="text-sm font-bebas tracking-[0.18em] text-white uppercase">{label}</h2>
                 <span class="text-xs text-slate-500">
                   {dayMatches.length} {dayMatches.length === 1 ? "partido" : "partidos"}
                 </span>
               </div>
-              
+
               <div class="space-y-3">
                 {dayMatches.map((match) => (
                   <article class="rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 hover:bg-slate-900 transition-all">
                     <div class="p-4">
                       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <!-- Columna izquierda: Equipos -->
+                        <!-- Equipos -->
                         <div class="flex-1 space-y-3">
-                          <!-- Equipo local -->
+                          <!-- HOME -->
                           <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                              <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-xs font-bold text-slate-400">
-                                {match.homeTeam?.code || "???"}
+                            <div class="flex items-center gap-3 min-w-0">
+                              <div class="w-10 h-7 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex items-center justify-center flex-shrink-0">
+                                {getFlagUrl(match.homeTeam) ? (
+                                  <img
+                                    src={getFlagUrl(match.homeTeam)!}
+                                    alt={match.homeTeam?.code || match.homeTeam?.name || "HOME"}
+                                    class="w-full h-full object-cover"
+                                    loading="lazy"
+                                    onerror="this.style.display='none'"
+                                  />
+                                ) : (
+                                  <span class="text-xs font-bold text-slate-300">
+                                    {match.homeTeam?.code || "???"}
+                                  </span>
+                                )}
                               </div>
-                              <span class="text-sm font-semibold text-slate-100">
+                              <span class="text-sm font-semibold text-slate-100 truncate">
                                 {match.homeTeam?.name || "Por definir"}
                               </span>
                             </div>
@@ -384,13 +461,25 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
                             )}
                           </div>
 
-                          <!-- Equipo visitante -->
+                          <!-- AWAY -->
                           <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                              <div class="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center text-xs font-bold text-slate-400">
-                                {match.awayTeam?.code || "???"}
+                            <div class="flex items-center gap-3 min-w-0">
+                              <div class="w-10 h-7 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex items-center justify-center flex-shrink-0">
+                                {getFlagUrl(match.awayTeam) ? (
+                                  <img
+                                    src={getFlagUrl(match.awayTeam)!}
+                                    alt={match.awayTeam?.code || match.awayTeam?.name || "AWAY"}
+                                    class="w-full h-full object-cover"
+                                    loading="lazy"
+                                    onerror="this.style.display='none'"
+                                  />
+                                ) : (
+                                  <span class="text-xs font-bold text-slate-300">
+                                    {match.awayTeam?.code || "???"}
+                                  </span>
+                                )}
                               </div>
-                              <span class="text-sm font-semibold text-slate-100">
+                              <span class="text-sm font-semibold text-slate-100 truncate">
                                 {match.awayTeam?.name || "Por definir"}
                               </span>
                             </div>
@@ -402,31 +491,25 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
                           </div>
                         </div>
 
-                        <!-- Columna derecha: Info del partido -->
+                        <!-- Info -->
                         <div class="flex flex-col items-start md:items-end gap-2 min-w-[160px]">
-                          {/* Hora */}
                           <div class="text-sm font-semibold text-yellow-400">
                             {formatTime(match.matchDate)}
                           </div>
 
-                          {/* Grupo y fase */}
                           <div class="text-xs text-slate-400">
                             {match.group && <span>Grupo {match.group} · </span>}
                             <span>{shortPhase(match.phase)}</span>
                           </div>
 
-                          {/* Estadio */}
                           {match.stadium && (
                             <div class="text-xs text-slate-500">
                               🏟️ {match.stadium}
                             </div>
                           )}
 
-                          {/* Estado */}
                           <span class={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${statusBadgeClass(match.status)}`}>
-                            {match.status === "Live" && (
-                              <span class="h-2 w-2 rounded-full bg-red-400 animate-pulse" />
-                            )}
+                            {match.status === "Live" && <span class="h-2 w-2 rounded-full bg-red-400 animate-pulse" />}
                             {statusLabel(match.status)}
                           </span>
                         </div>
@@ -441,7 +524,7 @@ const totalFinished = allMatches.filter((m) => m.status === "Finished").length;
       </section>
     )}
 
-    <!-- CTA para hacer predicciones -->
+    <!-- CTA -->
     <div class="bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-2xl border border-blue-700/30 p-6 mt-8">
       <div class="flex flex-col md:flex-row items-center justify-between gap-4">
         <div class="flex-1">

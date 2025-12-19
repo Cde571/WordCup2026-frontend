@@ -288,7 +288,7 @@ export default function TeamsExplorer() {
             predicciones.
           </p>
           <p className="mt-1 text-[11px] text-slate-400">
-            Datos desde <span className="font-mono text-[10px]">{API_BASE}</span>.
+           
           </p>
         </div>
 

@@ -11,6 +11,14 @@ const { title = "Mundial 2026" } = Astro.props;
     <title>{title}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- Favicons (archivos deben estar en /public) -->
+    <link rel="icon" href="public/favicon.png" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#020617" />
+
     <!-- Google Fonts: Bebas Neue + Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,8 +27,14 @@ const { title = "Mundial 2026" } = Astro.props;
       rel="stylesheet"
     />
   </head>
+
   <body class="bg-slate-950 text-slate-50 min-h-screen">
     <TopNav />
+
+    <!-- HERO FULL WIDTH (sin max-width, sin padding) -->
+    <slot name="hero" />
+
+    <!-- CONTENIDO NORMAL (centrado) -->
     <main class="max-w-6xl mx-auto px-4 py-6">
       <slot />
     </main>

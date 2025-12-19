@@ -1,0 +1,13 @@
+---
+// src/pages/admin.astro
+import Layout from "../components/layout/MainLayout.astro";
+import AdminDashboard from '../components/admin/AdminDashboard';
+---
+
+<Layout title="Panel de Administración - Mundial 2026">
+  <AdminDashboard client:load />
+</Layout>
+
+<style>
+  /* Estilos globales si los necesitas */
+</style>
