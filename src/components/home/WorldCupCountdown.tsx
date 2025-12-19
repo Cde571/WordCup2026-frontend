@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const WORLD_CUP_START = new Date("2026-06-11T15:00:00").getTime();
 
@@ -23,7 +23,8 @@ function getTimeLeft() {
   return { total: diff, months, days, hours, minutes, seconds };
 }
 
-export default function WorldCupCountdownRetroSilver() {
+// Diseño 1: Glassmorphism Luxury
+function Design1() {
   const [time, setTime] = useState(getTimeLeft());
 
   useEffect(() => {
@@ -31,322 +32,242 @@ export default function WorldCupCountdownRetroSilver() {
     return () => clearInterval(id);
   }, []);
 
-  // id único para inyectar estilos sin colisionar si lo renderizas varias veces
-  const styleId = useMemo(
-    () => `wc-retro-silver-${Math.random().toString(36).slice(2)}`,
-    []
-  );
-
-  if (time.total <= 0) {
-    return (
-      <div className="relative rounded-2xl border border-white/20 bg-black/55 px-6 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.55)]">
-        <span className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-white/10 via-white/25 to-white/10 blur-sm" />
-        <span className="relative">¡EL MUNDIAL YA COMENZÓ!</span>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative">
-      <style id={styleId}>{css}</style>
-
-      <div className="wcSilverWrap">
-        {/* halo exterior */}
-        <div className="wcHalo" />
-
-        {/* caja principal */}
-        <div className="wcShell">
-          {/* “cromo” borde */}
-          <div className="wcChromeBorder" />
-
-          {/* brillo superior */}
-          <div className="wcTopShine" />
-
-          <div className="wcInner">
-            <div className="wcBadge" aria-hidden="true" />
-
-            <div className="flex flex-col gap-1">
-              <span className="wcLabel">EL MUNDIAL COMIENZA EN:</span>
-
-              <div className="flex flex-wrap gap-2 text-center">
-                <FlipBox label="MESES" value={time.months} />
-                <FlipBox label="DÍAS" value={time.days} />
-                <FlipBox label="HS" value={time.hours} />
-                <FlipBox label="MIN" value={time.minutes} />
-                <FlipBox label="SEG" value={time.seconds} />
+    <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-200 via-purple-900 to-blue-900 p-8">
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-20"></div>
+      
+      <div className="relative backdrop-blur-3xl bg-white/10 rounded-3xl p-12 shadow-2xl border border-white/20 max-w-4xl w-full">
+        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent rounded-3xl"></div>
+        
+        <div className="relative">
+          <div className="text-center mb-12">
+            <div className="inline-block mb-4">
+              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/50">
+                <span className="text-4xl">⚽</span>
               </div>
             </div>
+            <h1 className="text-5xl font-black text-white mb-2 tracking-tight">MUNDIAL 2026</h1>
+            <p className="text-white/70 text-lg font-light tracking-widest">EL SUEÑO COMIENZA EN</p>
           </div>
 
-          {/* scanline */}
-          <div className="wcScanline" />
+          <div className="grid grid-cols-5 gap-6">
+            {[
+              { label: "MESES", value: time.months },
+              { label: "DÍAS", value: time.days },
+              { label: "HORAS", value: time.hours },
+              { label: "MINUTOS", value: time.minutes },
+              { label: "SEGUNDOS", value: time.seconds }
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="w-full aspect-square rounded-2xl bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-xl border border-white/30 shadow-xl flex items-center justify-center mb-3 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  <span className="text-5xl font-black text-white relative z-10">
+                    {String(item.value).padStart(2, "0")}
+                  </span>
+                </div>
+                <span className="text-white/60 text-xs font-bold tracking-widest">{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function FlipBox({ label, value }: { label: string; value: number }) {
-  const v = String(value).padStart(2, "0");
+// Diseño 2: Neomorphic Dark
+function Design2() {
+  const [time, setTime] = useState(getTimeLeft());
+
+  useEffect(() => {
+    const id = setInterval(() => setTime(getTimeLeft()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
-    <div className="wcTile" role="group" aria-label={`${label}: ${v}`}>
-      <div className="wcTileChrome" />
-      <div className="wcTileInner">
-        <div className="wcDigits">
-          {/* “placa” superior/inferior para look retro */}
-          <div className="wcPlate wcPlateTop" />
-          <div className="wcPlate wcPlateBottom" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8">
+      <div className="max-w-5xl w-full">
+        <div className="bg-gray-900 rounded-3xl p-12 shadow-[20px_20px_60px_#0a0a0a,-20px_-20px_60px_#262626]">
+          <div className="text-center mb-16">
+            <div className="inline-block mb-6 relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full blur-2xl opacity-50"></div>
+              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-lg">
+                <span className="text-5xl">🏆</span>
+              </div>
+            </div>
+            <h1 className="text-6xl font-black bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent mb-4">
+              FIFA WORLD CUP 2026
+            </h1>
+            <p className="text-gray-500 text-sm font-semibold tracking-[0.3em] uppercase">Cuenta Regresiva</p>
+          </div>
 
-          {/* dígito con glow */}
-          <span className="wcDigitText">{v}</span>
-
-          {/* highlight */}
-          <span className="wcDigitGloss" aria-hidden="true" />
+          <div className="flex justify-center gap-8">
+            {[
+              { label: "Meses", value: time.months },
+              { label: "Días", value: time.days },
+              { label: "Horas", value: time.hours },
+              { label: "Min", value: time.minutes },
+              { label: "Seg", value: time.seconds }
+            ].map((item, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="w-28 h-32 rounded-2xl bg-gray-900 shadow-[inset_8px_8px_16px_#0a0a0a,inset_-8px_-8px_16px_#262626] flex items-center justify-center mb-4 relative overflow-hidden group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 via-transparent to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <span className="text-5xl font-black bg-gradient-to-br from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+                    {String(item.value).padStart(2, "0")}
+                  </span>
+                </div>
+                <span className="text-gray-600 text-xs font-bold tracking-wider uppercase">{item.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
-
-        <span className="wcMiniLabel">{label}</span>
       </div>
     </div>
   );
 }
 
-const css = `
-/* ====== CONTENEDOR GENERAL ====== */
-.wcSilverWrap{
-  position: relative;
-  display: inline-block;
-  border-radius: 18px;
-}
+// Diseño 3: Gradient Glow
+function Design3() {
+  const [time, setTime] = useState(getTimeLeft());
 
-/* halo retroiluminado */
-.wcHalo{
-  position:absolute;
-  inset:-10px;
-  border-radius: 22px;
-  background:
-    radial-gradient(60% 80% at 30% 20%, rgba(255,255,255,.35), transparent 60%),
-    radial-gradient(60% 80% at 70% 80%, rgba(190,210,255,.18), transparent 60%),
-    linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
-  filter: blur(10px);
-  opacity: .85;
-  pointer-events:none;
-  animation: wcPulse 2.8s ease-in-out infinite;
-}
+  useEffect(() => {
+    const id = setInterval(() => setTime(getTimeLeft()), 1000);
+    return () => clearInterval(id);
+  }, []);
 
-@keyframes wcPulse{
-  0%,100%{ transform: scale(1); opacity:.75; }
-  50%{ transform: scale(1.02); opacity:.95; }
-}
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-black p-8 relative overflow-hidden">
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-cyan-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"></div>
+        <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-4000"></div>
+      </div>
 
-/* caja principal: fondo oscuro tipo “panel” */
-.wcShell{
-  position: relative;
-  border-radius: 18px;
-  padding: 12px 14px;
-  background:
-    radial-gradient(120% 140% at 20% 10%, rgba(255,255,255,.08), transparent 45%),
-    linear-gradient(180deg, rgba(15,18,25,.92), rgba(6,8,12,.92));
-  box-shadow:
-    0 18px 60px rgba(0,0,0,.55),
-    inset 0 1px 0 rgba(255,255,255,.10),
-    inset 0 -1px 0 rgba(0,0,0,.55);
-  overflow:hidden;
-}
+      <div className="relative max-w-6xl w-full">
+        <div className="text-center mb-20">
+          <div className="inline-block mb-8 relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 rounded-full blur-3xl opacity-60 animate-pulse"></div>
+            <div className="relative">
+              <span className="text-8xl">⚽</span>
+            </div>
+          </div>
+          <h1 className="text-7xl font-black text-white mb-4 tracking-tighter">
+            WORLD CUP <span className="bg-gradient-to-r from-yellow-400 via-red-500 to-pink-500 bg-clip-text text-transparent">2026</span>
+          </h1>
+          <div className="h-1 w-32 bg-gradient-to-r from-transparent via-white to-transparent mx-auto mb-6"></div>
+          <p className="text-gray-400 text-xl font-light tracking-[0.2em]">LA ESPERA TERMINA EN</p>
+        </div>
 
-/* borde cromado plateado */
-.wcChromeBorder{
-  position:absolute;
-  inset:0;
-  border-radius:18px;
-  padding:1px;
-  background: linear-gradient(135deg,
-    rgba(255,255,255,.65),
-    rgba(255,255,255,.18) 30%,
-    rgba(255,255,255,.55) 55%,
-    rgba(255,255,255,.10) 80%,
-    rgba(255,255,255,.45));
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  pointer-events:none;
-  opacity:.9;
-}
-
-/* brillo superior */
-.wcTopShine{
-  position:absolute;
-  left:-30%;
-  top:-55%;
-  width:160%;
-  height:120%;
-  background: radial-gradient(circle at 50% 60%, rgba(255,255,255,.18), transparent 65%);
-  transform: rotate(-8deg);
-  pointer-events:none;
-}
-
-/* scanline sutil */
-.wcScanline{
-  position:absolute;
-  inset:0;
-  background: repeating-linear-gradient(
-    180deg,
-    rgba(255,255,255,.03) 0px,
-    rgba(255,255,255,.03) 1px,
-    transparent 3px,
-    transparent 6px
+        <div className="grid grid-cols-5 gap-6">
+          {[
+            { label: "MESES", value: time.months, color: "from-purple-500 to-pink-500" },
+            { label: "DÍAS", value: time.days, color: "from-cyan-500 to-blue-500" },
+            { label: "HORAS", value: time.hours, color: "from-green-500 to-emerald-500" },
+            { label: "MINUTOS", value: time.minutes, color: "from-orange-500 to-red-500" },
+            { label: "SEGUNDOS", value: time.seconds, color: "from-pink-500 to-rose-500" }
+          ].map((item, i) => (
+            <div key={i} className="relative group">
+              <div className={`absolute inset-0 bg-gradient-to-br ${item.color} rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-300`}></div>
+              <div className="relative bg-black/80 backdrop-blur-xl rounded-3xl p-8 border border-white/10 group-hover:border-white/20 transition-colors duration-300">
+                <div className="text-center">
+                  <div className={`text-6xl font-black bg-gradient-to-br ${item.color} bg-clip-text text-transparent mb-4`}>
+                    {String(item.value).padStart(2, "0")}
+                  </div>
+                  <div className="text-gray-400 text-xs font-bold tracking-widest uppercase">{item.label}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
-  mix-blend-mode: overlay;
-  opacity:.35;
-  pointer-events:none;
 }
 
-.wcInner{
-  position: relative;
-  display:flex;
-  align-items:center;
-  gap:12px;
+// Diseño 4: Minimal Luxury
+function Design4() {
+  const [time, setTime] = useState(getTimeLeft());
+
+  useEffect(() => {
+    const id = setInterval(() => setTime(getTimeLeft()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-black to-amber-50 p-8">
+      <div className="max-w-5xl w-full">
+        <div className="bg-white rounded-3xl p-16 shadow-2xl border border-amber-200/50">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-4 mb-8">
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 animate-pulse"></div>
+              <span className="text-amber-800 text-sm font-semibold tracking-[0.3em] uppercase">En Vivo</span>
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-amber-600 to-orange-600 animate-pulse"></div>
+            </div>
+            <h1 className="text-7xl font-light text-gray-900 mb-2 tracking-tight">FIFA World Cup</h1>
+            <p className="text-6xl font-black bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">2026</p>
+          </div>
+
+          <div className="flex justify-center gap-12 mb-12">
+            {[
+              { label: "Meses", value: time.months },
+              { label: "Días", value: time.days },
+              { label: "Horas", value: time.hours },
+              { label: "Minutos", value: time.minutes },
+              { label: "Segundos", value: time.seconds }
+            ].map((item, i) => (
+              <div key={i} className="text-center">
+                <div className="mb-3 relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl blur opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+                  <div className="relative text-7xl font-light text-gray-900 tabular-nums">
+                    {String(item.value).padStart(2, "0")}
+                  </div>
+                </div>
+                <div className="h-px w-12 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto mb-2"></div>
+                <span className="text-amber-800 text-xs font-semibold tracking-widest uppercase">{item.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 text-gray-500 text-sm">
+              <span>🏟️</span>
+              <span>México • Estados Unidos • Canadá</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
-/* badge plateado retro */
-.wcBadge{
-  width:42px;
-  height:42px;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 35% 30%, rgba(255,255,255,.95), rgba(255,255,255,.10) 55%, rgba(0,0,0,.35) 100%),
-    linear-gradient(135deg, rgba(255,255,255,.65), rgba(255,255,255,.12));
-  box-shadow:
-    0 12px 30px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.65),
-    inset 0 -8px 20px rgba(0,0,0,.35);
-  border: 1px solid rgba(255,255,255,.18);
-}
+// Selector de diseños
+export default function PremiumCountdownDesigns() {
+  const [design, setDesign] = useState(1);
 
-/* label superior */
-.wcLabel{
-  font-size: 11px;
-  letter-spacing: .12em;
-  font-weight: 800;
-  color: rgba(230,235,255,.92);
-  text-transform: uppercase;
-  text-shadow: 0 0 14px rgba(220,235,255,.35);
+  return (
+    <div className="min-h-screen">
+      {design === 1 && <Design1 />}
+      {design === 2 && <Design2 />}
+      {design === 3 && <Design3 />}
+      {design === 4 && <Design4 />}
+      
+      <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="bg-black/90 backdrop-blur-xl rounded-full px-6 py-3 flex gap-3 border border-white/20 shadow-2xl">
+          {[1, 2, 3, 4].map(num => (
+            <button
+              key={num}
+              onClick={() => setDesign(num)}
+              className={`w-12 h-12 rounded-full font-bold transition-all duration-300 ${
+                design === num
+                  ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-blue-500/50 scale-110'
+                  : 'bg-white/10 text-white/60 hover:bg-white/20'
+              }`}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 }
-
-/* ====== TILES (cajas) ====== */
-.wcTile{
-  position: relative;
-  width: 74px;
-  border-radius: 14px;
-}
-
-.wcTileChrome{
-  position:absolute;
-  inset:0;
-  border-radius:14px;
-  background: linear-gradient(135deg,
-    rgba(255,255,255,.55),
-    rgba(255,255,255,.10) 35%,
-    rgba(255,255,255,.45) 60%,
-    rgba(255,255,255,.08));
-  filter: blur(.2px);
-  opacity:.7;
-}
-
-.wcTileInner{
-  position: relative;
-  border-radius: 14px;
-  padding: 8px 8px 7px;
-  background: linear-gradient(180deg, rgba(12,14,20,.92), rgba(5,6,10,.92));
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.10),
-    inset 0 -1px 0 rgba(0,0,0,.65);
-}
-
-.wcDigits{
-  position: relative;
-  height: 44px;
-  border-radius: 12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  background:
-    radial-gradient(120% 120% at 40% 20%, rgba(255,255,255,.10), transparent 55%),
-    linear-gradient(180deg, rgba(20,24,34,.92), rgba(8,10,16,.92));
-  border: 1px solid rgba(255,255,255,.10);
-}
-
-/* placas “flip clock” */
-.wcPlate{
-  position:absolute;
-  left:0;
-  right:0;
-  height:50%;
-  background: rgba(255,255,255,.03);
-  pointer-events:none;
-}
-.wcPlateTop{
-  top:0;
-  border-bottom: 1px solid rgba(255,255,255,.06);
-}
-.wcPlateBottom{
-  bottom:0;
-  border-top: 1px solid rgba(0,0,0,.35);
-}
-
-/* texto dígito con retroiluminado plateado/azulado */
-.wcDigitText{
-  position: relative;
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: .06em;
-  color: rgba(245,248,255,.95);
-  text-shadow:
-    0 0 10px rgba(220,235,255,.45),
-    0 0 22px rgba(190,210,255,.22);
-}
-
-/* gloss diagonal */
-.wcDigitGloss{
-  position:absolute;
-  top:-30%;
-  left:-40%;
-  width: 160%;
-  height: 120%;
-  background: linear-gradient(110deg,
-    transparent 0%,
-    rgba(255,255,255,.20) 35%,
-    rgba(255,255,255,.08) 50%,
-    transparent 70%);
-  transform: rotate(-10deg);
-  opacity:.9;
-  animation: wcGlint 3.6s ease-in-out infinite;
-}
-
-@keyframes wcGlint{
-  0%{ transform: translateX(-12%) rotate(-10deg); opacity:.55;}
-  50%{ transform: translateX(10%) rotate(-10deg); opacity:.95;}
-  100%{ transform: translateX(-12%) rotate(-10deg); opacity:.55;}
-}
-
-.wcMiniLabel{
-  display:block;
-  margin-top: 6px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: .12em;
-  color: rgba(210,220,245,.78);
-  text-transform: uppercase;
-}
-
-/* responsivo */
-@media (max-width: 480px){
-  .wcTile{ width: 66px; }
-  .wcDigitText{ font-size: 20px; }
-}
-`;

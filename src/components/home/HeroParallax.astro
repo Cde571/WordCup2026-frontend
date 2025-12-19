@@ -1,18 +1,14 @@
 ---
-const IMG = "/worldcup-hero.png.jpg"; // IMPORTANTE: sin "public/"
+const IMG = "/worldcup-hero.png";
 const TITLE = "FIFA WORLD CUP 2026";
 const SUBTITLE = "Predicciones • Bracket • Ranking";
 ---
 
 <section id="hero-parallax" class="relative">
-  <!-- Altura “larga” para que el scroll tenga recorrido -->
   <div class="h-[220vh]">
-    <!-- Contenedor sticky -->
     <div class="sticky top-0 h-screen overflow-hidden">
-      <!-- Fondo base -->
       <div class="absolute inset-0 bg-black"></div>
 
-      <!-- Imagen (la “cámara” hace zoom con scroll) -->
       <img
         id="hero-image"
         src={IMG}
@@ -23,19 +19,16 @@ const SUBTITLE = "Predicciones • Bracket • Ranking";
         fetchpriority="high"
       />
 
-      <!-- Vignette + gradientes cinematográficos -->
       <div class="pointer-events-none absolute inset-0">
         <div class="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/75"></div>
         <div class="absolute inset-0 [box-shadow:inset_0_0_120px_rgba(0,0,0,0.85)]"></div>
       </div>
 
-      <!-- “Brillo plateado” retroiluminado (sutil) -->
       <div
         class="pointer-events-none absolute -inset-8 opacity-70 blur-2xl"
         style="background: radial-gradient(60% 60% at 50% 30%, rgba(255,255,255,.20), transparent 60%);"
       ></div>
 
-      <!-- Contenido encima -->
       <div class="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-14">
         <div class="max-w-xl">
           <p class="text-xs font-semibold tracking-[0.22em] text-white/80">
@@ -69,7 +62,6 @@ const SUBTITLE = "Predicciones • Bracket • Ranking";
         </div>
       </div>
 
-      <!-- “Scroll hint” -->
       <div class="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2">
         <div class="h-9 w-6 rounded-full border border-white/30">
           <div class="mx-auto mt-2 h-2 w-1 rounded-full bg-white/70 animate-[heroDot_1.2s_ease-in-out_infinite]"></div>
@@ -78,7 +70,6 @@ const SUBTITLE = "Predicciones • Bracket • Ranking";
     </div>
   </div>
 
-  <!-- Sección siguiente -->
   <div class="relative -mt-[25vh] mx-auto max-w-6xl px-6 pb-10">
     <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
       <h2 class="text-sm font-semibold text-white">Ya estás dentro</h2>
@@ -87,71 +78,65 @@ const SUBTITLE = "Predicciones • Bracket • Ranking";
       </p>
     </div>
   </div>
-</section>
 
-<style>
-  @keyframes heroDot {
-    0%, 100% { transform: translateY(0); opacity: .65; }
-    50% { transform: translateY(10px); opacity: 1; }
-  }
-</style>
-
-<!-- IMPORTANTE en Astro: script inline + module + DOMContentLoaded -->
-<script is:inline type="module">
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-
-  function initHeroParallax() {
-    const hero = document.getElementById("hero-parallax");
-    const img = document.getElementById("hero-image");
-
-    if (!hero || !img) return;
-
-    let raf = 0;
-
-    const update = () => {
-      raf = 0;
-
-      const rect = hero.getBoundingClientRect();
-      const viewportH = window.innerHeight;
-
-      // progreso del scroll dentro del hero: 0 → 1
-      const total = rect.height - viewportH;
-      const scrolled = clamp(-rect.top, 0, total);
-      const p = total > 0 ? scrolled / total : 0;
-
-      const scale = 1 + p * 0.28;
-      const translateY = p * -40;
-      const translateX = p * 10;
-      const blur = p * 1.2;
-      const saturate = 1 + p * 0.12;
-      const contrast = 1 + p * 0.10;
-
-      img.style.transform =
-        `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
-      img.style.filter =
-        `blur(${blur}px) saturate(${saturate}) contrast(${contrast})`;
-    };
-
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
-
-    // reduce motion
-    const prefersReduced =
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    if (!prefersReduced) {
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("resize", onScroll);
-      update();
+  <style>
+    @keyframes heroDot {
+      0%, 100% { transform: translateY(0); opacity: .65; }
+      50% { transform: translateY(10px); opacity: 1; }
     }
-  }
+  </style>
 
-  // garantiza que exista el DOM
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initHeroParallax);
-  } else {
-    initHeroParallax();
-  }
-</script>
+  <script is:inline type="module">
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+
+    function initHeroParallax() {
+      const hero = document.getElementById("hero-parallax");
+      const img = document.getElementById("hero-image");
+
+      if (!hero || !img) return;
+
+      let raf = 0;
+
+      const update = () => {
+        raf = 0;
+        const rect = hero.getBoundingClientRect();
+        const viewportH = window.innerHeight;
+        const total = rect.height - viewportH;
+        const scrolled = clamp(-rect.top, 0, total);
+        const p = total > 0 ? scrolled / total : 0;
+
+        const scale = 1 + p * 0.28;
+        const translateY = p * -40;
+        const translateX = p * 10;
+        const blur = p * 1.2;
+        const saturate = 1 + p * 0.12;
+        const contrast = 1 + p * 0.10;
+
+        img.style.transform =
+          `translate3d(${translateX}px, ${translateY}px, 0) scale(${scale})`;
+        img.style.filter =
+          `blur(${blur}px) saturate(${saturate}) contrast(${contrast})`;
+      };
+
+      const onScroll = () => {
+        if (!raf) raf = requestAnimationFrame(update);
+      };
+
+      const prefersReduced =
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (!prefersReduced) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll);
+        update();
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initHeroParallax);
+    } else {
+      initHeroParallax();
+    }
+  </script>
+</section>
