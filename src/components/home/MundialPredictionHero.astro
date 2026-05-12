@@ -1,0 +1,319 @@
+﻿---
+const messiImage = "/wc26-legends/messi.png";
+const cristianoImage = "/wc26-legends/cristiano.png";
+---
+
+<section class="mundial-hero">
+  <div class="mundial-hero__bg"></div>
+
+  <div class="mundial-hero__content">
+    <div class="mundial-hero__tag">
+      Mundial 2026 Predictor Arena
+    </div>
+
+    <h1>
+      Predice el torneo, compite con tus amigos y sube en el ranking.
+    </h1>
+
+    <p>
+      Arma tus grupos, predice partidos, elige campeón y participa en una competencia completa del Mundial 2026.
+    </p>
+
+    <div class="mundial-hero__actions">
+      <a href="/grupos" class="mundial-hero__btn mundial-hero__btn--primary">
+        Empezar predicción
+      </a>
+
+      <a href="/leaderboard" class="mundial-hero__btn mundial-hero__btn--secondary">
+        Ver ranking
+      </a>
+
+      <a href="/partidos" class="mundial-hero__btn mundial-hero__btn--ghost">
+        Calendario
+      </a>
+    </div>
+
+    <div class="mundial-hero__flow">
+      <span>Login Google</span>
+      <span>Predicciones</span>
+      <span>Puntos</span>
+      <span>Leaderboard</span>
+    </div>
+  </div>
+
+  <div class="mundial-hero__players">
+    <div class="mundial-hero__player mundial-hero__player--left">
+      <img src={messiImage} alt="Jugador referente Argentina" loading="eager" />
+    </div>
+
+    <div class="mundial-hero__center">
+      <div class="mundial-hero__trophy">26</div>
+      <span>VS</span>
+    </div>
+
+    <div class="mundial-hero__player mundial-hero__player--right">
+      <img src={cristianoImage} alt="Jugador referente Portugal" loading="eager" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .mundial-hero {
+    position: relative;
+    min-height: 680px;
+    overflow: hidden;
+    border-radius: 0 0 42px 42px;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(0, 220, 255, 0.24), transparent 32%),
+      radial-gradient(circle at 84% 10%, rgba(255, 205, 70, 0.22), transparent 34%),
+      linear-gradient(135deg, #050716 0%, #081229 42%, #121936 100%);
+    color: white;
+    isolation: isolate;
+  }
+
+  .mundial-hero__bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.72), rgba(0,0,0,.22), rgba(0,0,0,.7)),
+      repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,.045) 0,
+        rgba(255,255,255,.045) 1px,
+        transparent 1px,
+        transparent 90px
+      );
+    z-index: -2;
+  }
+
+  .mundial-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -15% -55% -15%;
+    height: 65%;
+    background:
+      radial-gradient(ellipse at center, rgba(0, 214, 255, .2), transparent 62%);
+    z-index: -1;
+  }
+
+  .mundial-hero__content {
+    position: relative;
+    z-index: 3;
+    max-width: 760px;
+    padding: clamp(32px, 6vw, 82px);
+  }
+
+  .mundial-hero__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    color: #ffd66b;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-size: .78rem;
+    backdrop-filter: blur(18px);
+  }
+
+  .mundial-hero h1 {
+    margin: 22px 0 0;
+    max-width: 760px;
+    font-size: clamp(2.55rem, 7vw, 6.4rem);
+    line-height: .88;
+    letter-spacing: -0.075em;
+    text-wrap: balance;
+  }
+
+  .mundial-hero p {
+    margin: 24px 0 0;
+    max-width: 590px;
+    color: rgba(255,255,255,.72);
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    line-height: 1.7;
+  }
+
+  .mundial-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .mundial-hero__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 18px;
+    border-radius: 999px;
+    text-decoration: none;
+    font-weight: 900;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease;
+  }
+
+  .mundial-hero__btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .mundial-hero__btn--primary {
+    color: #05111d;
+    background: linear-gradient(135deg, #00dcff, #5ff7b2);
+  }
+
+  .mundial-hero__btn--secondary {
+    color: #05111d;
+    background: linear-gradient(135deg, #ffd66b, #ff9f43);
+  }
+
+  .mundial-hero__btn--ghost {
+    color: white;
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(255,255,255,.08);
+  }
+
+  .mundial-hero__flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .mundial-hero__flow span {
+    padding: 8px 12px;
+    border-radius: 999px;
+    color: rgba(255,255,255,.78);
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.06);
+    font-size: .84rem;
+    font-weight: 700;
+  }
+
+  .mundial-hero__players {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .mundial-hero__player {
+    position: absolute;
+    bottom: -20px;
+    width: min(39vw, 520px);
+    height: min(78vh, 660px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    filter: drop-shadow(0 30px 55px rgba(0,0,0,.65));
+  }
+
+  .mundial-hero__player img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .mundial-hero__player--left {
+    right: min(38vw, 560px);
+  }
+
+  .mundial-hero__player--right {
+    right: 0;
+  }
+
+  .mundial-hero__center {
+    position: absolute;
+    right: min(32vw, 470px);
+    top: 52%;
+    transform: translateY(-50%);
+    display: grid;
+    place-items: center;
+    gap: 10px;
+  }
+
+  .mundial-hero__trophy {
+    width: 112px;
+    height: 112px;
+    display: grid;
+    place-items: center;
+    border-radius: 32px;
+    color: #05111d;
+    font-size: 2.6rem;
+    font-weight: 1000;
+    background: linear-gradient(135deg, #ffd66b, #00dcff);
+    box-shadow: 0 25px 70px rgba(0,0,0,.38);
+  }
+
+  .mundial-hero__center span {
+    color: #ffd66b;
+    font-weight: 1000;
+    letter-spacing: .16em;
+  }
+
+  @media (max-width: 1050px) {
+    .mundial-hero {
+      min-height: 760px;
+    }
+
+    .mundial-hero__content {
+      max-width: 100%;
+      padding-bottom: 360px;
+    }
+
+    .mundial-hero__player {
+      width: 50vw;
+      height: 390px;
+      bottom: -10px;
+    }
+
+    .mundial-hero__player--left {
+      left: -5vw;
+      right: auto;
+    }
+
+    .mundial-hero__player--right {
+      right: -5vw;
+    }
+
+    .mundial-hero__center {
+      top: auto;
+      bottom: 165px;
+      right: 50%;
+      transform: translateX(50%);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mundial-hero {
+      border-radius: 0 0 28px 28px;
+    }
+
+    .mundial-hero__content {
+      padding: 28px 20px 320px;
+    }
+
+    .mundial-hero__actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .mundial-hero__player {
+      width: 60vw;
+      height: 300px;
+    }
+
+    .mundial-hero__center {
+      bottom: 128px;
+    }
+
+    .mundial-hero__trophy {
+      width: 78px;
+      height: 78px;
+      border-radius: 24px;
+      font-size: 1.8rem;
+    }
+  }
+</style>

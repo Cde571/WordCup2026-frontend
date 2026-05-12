@@ -1,0 +1,93 @@
+﻿---
+import { API_BASE } from "../lib/api";
+
+async function check(path: string) {
+  try {
+    const res = await fetch(`${API_BASE}${path}`);
+    const data = await res.json();
+
+    return {
+      path,
+      ok: res.ok,
+      status: res.status,
+      count: data?.count ?? data?.leaderboard?.length ?? null,
+      data: JSON.stringify(data).slice(0, 500),
+    };
+  } catch (error: any) {
+    return {
+      path,
+      ok: false,
+      status: "ERROR",
+      count: null,
+      data: error?.message || "Error desconocido",
+    };
+  }
+}
+
+const checks = await Promise.all([
+  check("/health"),
+  check("/api/teams"),
+  check("/api/matches"),
+  check("/api/players"),
+  check("/api/leaderboard"),
+  check("/auth/status"),
+]);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>Flujo WC26</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        background: #0b1020;
+        color: white;
+        padding: 32px;
+      }
+
+      .card {
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 18px;
+        padding: 18px;
+        margin-bottom: 14px;
+        background: rgba(255,255,255,.06);
+      }
+
+      .ok { color: #4ade80; }
+      .bad { color: #fb7185; }
+
+      pre {
+        white-space: pre-wrap;
+        color: #b8c2d8;
+        overflow: auto;
+      }
+
+      a {
+        color: #38bdf8;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Diagnóstico del flujo WC26</h1>
+    <p>Backend: {API_BASE}</p>
+    <p>
+      Esta página es solo técnica. No cambia el diseño principal.
+    </p>
+
+    {checks.map((item) => (
+      <div class="card">
+        <h2 class={item.ok ? "ok" : "bad"}>{item.path}</h2>
+        <p>Status: {item.status}</p>
+        <p>Count: {item.count ?? "No aplica"}</p>
+        <pre>{item.data}</pre>
+      </div>
+    ))}
+
+    <p>
+      <a href="/">Volver a la app</a>
+    </p>
+  </body>
+</html>

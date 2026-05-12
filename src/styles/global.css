@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+:root {
+  font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color-scheme: dark;
+  background: #020617;
+  --wc-gold: #f8d24a;
+  --wc-gold-soft: rgba(248, 210, 74, 0.16);
+  --wc-navy: #020617;
+  --wc-panel: rgba(15, 23, 42, 0.72);
+  --wc-border: rgba(148, 163, 184, 0.18);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(14, 165, 233, .16), transparent 28rem),
+    radial-gradient(circle at 85% 12%, rgba(248, 210, 74, .18), transparent 24rem),
+    radial-gradient(circle at 50% 100%, rgba(16, 185, 129, .10), transparent 28rem),
+    #020617;
+  color: #f8fafc;
+}
+
+a { text-decoration: none; }
+button, a { -webkit-tap-highlight-color: transparent; }
+::selection { background: rgba(248, 210, 74, .38); color: #fff; }
+
+.font-bebas, .bebas {
+  font-family: "Bebas Neue", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wc-shell {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--wc-border);
+  background: linear-gradient(145deg, rgba(15, 23, 42, .82), rgba(2, 6, 23, .76));
+  box-shadow: 0 24px 80px rgba(0,0,0,.38);
+  backdrop-filter: blur(18px);
+}
+
+.wc-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.08), transparent 35%),
+    radial-gradient(circle at top right, rgba(248, 210, 74, .12), transparent 18rem);
+}
+
+.wc-card {
+  border: 1px solid var(--wc-border);
+  background: rgba(15, 23, 42, .68);
+  box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  backdrop-filter: blur(16px);
+}
+
+.wc-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  border: 1px solid rgba(248, 210, 74, .32);
+  background: rgba(248, 210, 74, .10);
+  color: #fde68a;
+  border-radius: 999px;
+  padding: .45rem .75rem;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.wc-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fde047, #f59e0b);
+  color: #111827;
+  font-weight: 900;
+  box-shadow: 0 16px 36px rgba(245, 158, 11, .22);
+  transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+.wc-primary:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 20px 46px rgba(245, 158, 11, .30); }
+
+.wc-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  color: #f8fafc;
+  font-weight: 800;
+  backdrop-filter: blur(10px);
+  transition: background .18s ease, transform .18s ease, border-color .18s ease;
+}
+.wc-secondary:hover { background: rgba(255,255,255,.11); border-color: rgba(255,255,255,.26); transform: translateY(-1px); }
+
+.wc-grid-bg {
+  background-image:
+    linear-gradient(rgba(148,163,184,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148,163,184,.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+@keyframes wcFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes wcPulseRing {
+  0% { transform: scale(.92); opacity: .64; }
+  70% { transform: scale(1.28); opacity: 0; }
+  100% { transform: scale(1.28); opacity: 0; }
+}
+
+.wc-team-mark {
+  position: relative;
+  overflow: hidden;
+}
+
+.wc-team-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+}
+
+.wc-team-mark span {
+  position: relative;
+  z-index: 2;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(5, 8, 22, 0.68);
+  color: #fff;
+  font-weight: 900;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+}
+
+.wc-player-avatar {
+  background: #111827;
+}
+
+.wc-avatar-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 201, 40, 0.3);
+  border-top-color: #ffc928;
+  border-radius: 999px;
+  animation: wcSpinAvatar 0.8s linear infinite;
+}
+
+@keyframes wcSpinAvatar {
+  to {
+    transform: rotate(360deg);
+  }
+}

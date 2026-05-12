@@ -1,0 +1,12 @@
+﻿node_modules/
+dist/
+.astro/
+.vite/
+.vercel/
+.env
+.env.local
+.env.*.local
+.DS_Store
+*.log
+*.bak*
+*.tsbuildinfo

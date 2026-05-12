@@ -1,0 +1,20 @@
+﻿---
+import ArenaMundial from "../components/wc26/ArenaMundial";
+import "../styles/wc26-arena.css";
+
+import MundialPredictionHero from '../components/home/MundialPredictionHero.astro';
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WC26 Arena</title>
+  </head>
+  <body>
+<MundialPredictionHero />
+    <ArenaMundial client:load initialTab="overview" />
+  </body>
+</html>
+

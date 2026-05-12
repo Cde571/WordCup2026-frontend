@@ -1,0 +1,76 @@
+﻿---
+import "../styles/wc26-arena.css";
+
+const backend = import.meta.env.PUBLIC_API_BASE_URL || "http://localhost:4000";
+
+async function check(path: string) {
+  try {
+    const res = await fetch(`${backend}${path}`);
+    const data = await res.json();
+
+    return {
+      path,
+      ok: res.ok,
+      status: res.status,
+      count: data?.count ?? data?.totalTeams ?? data?.totalPlayers ?? data?.totalMatches ?? null,
+      sample: JSON.stringify(data).slice(0, 600),
+    };
+  } catch (error: any) {
+    return {
+      path,
+      ok: false,
+      status: "ERROR",
+      count: null,
+      sample: error?.message || "Error desconocido",
+    };
+  }
+}
+
+const checks = await Promise.all([
+  check("/health"),
+  check("/api/teams"),
+  check("/api/matches"),
+  check("/api/players"),
+  check("/api/stats"),
+]);
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Diagnóstico API | WC26 Arena</title>
+  </head>
+
+  <body>
+    <main class="wc-page">
+      <section class="wc-hero">
+        <div class="wc-hero-content">
+          <div class="wc-kicker">Diagnóstico técnico</div>
+          <h1>Estado de conexión API</h1>
+          <p>Backend configurado: {backend}</p>
+          <div class="wc-actions">
+            <a href="/arena" class="wc-primary-button">Volver a Arena</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="wc-grid wc-grid-matches">
+        {checks.map((item) => (
+          <article class="wc-match-card">
+            <div class="wc-match-header">
+              <span>{item.path}</span>
+              <span>{item.ok ? "OK" : "ERROR"}</span>
+            </div>
+
+            <h3>Status: {item.status}</h3>
+            <p>Count: {item.count ?? "No aplica"}</p>
+
+            <pre style="white-space: pre-wrap; color: #a7b0c5; font-size: 12px; overflow: auto;">{item.sample}</pre>
+          </article>
+        ))}
+      </section>
+    </main>
+  </body>
+</html>

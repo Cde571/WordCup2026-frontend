@@ -1,0 +1,79 @@
+---
+import WorldCupCountdown from "./WorldCupCountdown.tsx";
+const IMG = "/worldcup-hero.png";
+---
+
+<section id="hero-parallax" class="relative overflow-hidden">
+  <div class="relative min-h-[92vh] overflow-hidden bg-slate-950">
+    <img id="hero-image" src={IMG} alt="Mundial 2026 predictor arena" class="absolute inset-0 h-full w-full object-cover opacity-70 will-change-transform" loading="eager" decoding="async" fetchpriority="high" />
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(250,204,21,.22),transparent_24rem),linear-gradient(90deg,rgba(2,6,23,.94),rgba(2,6,23,.58),rgba(2,6,23,.88))]"></div>
+    <div class="absolute inset-0 wc-grid-bg opacity-25"></div>
+
+    <div class="relative z-10 mx-auto flex min-h-[92vh] max-w-7xl items-center px-4 py-16 md:px-6">
+      <div class="max-w-3xl pt-10">
+        <span class="wc-pill">World Cup 2026 Predictor</span>
+        <h1 class="mt-5 font-bebas text-6xl leading-[.9] text-white sm:text-7xl md:text-8xl">
+          Predice. Arma tu bracket. Lidera la tabla.
+        </h1>
+        <p class="mt-5 max-w-2xl text-base leading-7 text-slate-200 md:text-lg">
+          Una arena competitiva para vivir el Mundial 2026 como manager: fase de grupos, eliminatorias, partidos, ranking global y progreso personal conectado al backend.
+        </p>
+        <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+          <a href="/grupos" class="px-6 py-3 text-sm wc-primary">Crear predicción</a>
+          <a href="/bracket" class="px-6 py-3 text-sm wc-secondary">Ver bracket</a>
+          <a href="/leaderboard" class="px-6 py-3 text-sm wc-secondary">Ranking global</a>
+        </div>
+
+        <div class="mt-8 grid max-w-2xl grid-cols-3 gap-3">
+          <div class="wc-card rounded-2xl p-4">
+            <p class="text-[10px] font-black uppercase tracking-[.18em] text-slate-400">Equipos</p>
+            <p class="mt-1 font-bebas text-4xl text-white">48</p>
+          </div>
+          <div class="wc-card rounded-2xl p-4">
+            <p class="text-[10px] font-black uppercase tracking-[.18em] text-slate-400">Grupos</p>
+            <p class="mt-1 font-bebas text-4xl text-white">12</p>
+          </div>
+          <div class="wc-card rounded-2xl p-4">
+            <p class="text-[10px] font-black uppercase tracking-[.18em] text-slate-400">Ruta final</p>
+            <p class="mt-1 font-bebas text-4xl text-yellow-200">104</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pointer-events-none absolute bottom-24 right-4 hidden w-[26rem] rounded-[2rem] border border-white/10 bg-white/[0.05] p-5 shadow-2xl backdrop-blur-xl lg:block" style="animation: wcFloat 4s ease-in-out infinite;">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <span class="text-xs font-black uppercase tracking-[.18em] text-yellow-200">Final proyectada</span>
+          <span class="rounded-full bg-emerald-400/10 px-3 py-1 text-[10px] font-bold text-emerald-200">Live predictor</span>
+        </div>
+        <div class="mt-4 grid grid-cols-[1fr,auto,1fr] items-center gap-3 text-center">
+          <div class="rounded-2xl bg-slate-950/70 p-4"><p class="text-xs text-slate-400">Tu favorito</p><p class="mt-1 font-bebas text-3xl text-white">COL</p></div>
+          <div class="font-bebas text-2xl text-yellow-200">VS</div>
+          <div class="rounded-2xl bg-slate-950/70 p-4"><p class="text-xs text-slate-400">Rival</p><p class="mt-1 font-bebas text-3xl text-white">ARG</p></div>
+        </div>
+        <div class="mt-4 h-2 overflow-hidden rounded-full bg-white/10"><div class="h-full w-[64%] rounded-full bg-gradient-to-r from-yellow-300 to-emerald-300"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <WorldCupCountdown client:load />
+
+  <script is:inline type="module">
+    const img = document.getElementById("hero-image");
+    const hero = document.getElementById("hero-parallax");
+    let raf = 0;
+    function update() {
+      raf = 0;
+      if (!img || !hero) return;
+      const rect = hero.getBoundingClientRect();
+      const p = Math.max(0, Math.min(1, -rect.top / Math.max(1, rect.height - window.innerHeight)));
+      img.style.transform = `scale(${1 + p * .12}) translateY(${p * -26}px)`;
+      img.style.filter = `saturate(${1 + p * .18}) contrast(${1 + p * .12})`;
+    }
+    function onScroll() { if (!raf) raf = requestAnimationFrame(update); }
+    if (!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      update();
+    }
+  </script>
+</section>

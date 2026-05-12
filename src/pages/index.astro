@@ -1,0 +1,86 @@
+﻿---
+import MainLayout from "../components/layout/MainLayout.astro";
+import HeroBanner from "../components/home/HeroBanner.astro";
+
+import MundialPredictionHero from '../components/home/MundialPredictionHero.astro';
+---
+
+<MainLayout title="WC26 Arena â€“ Mundial 2026 Predictor">
+<MundialPredictionHero />
+  <HeroBanner slot="hero" />
+
+  <section class="space-y-8">
+    <div class="grid gap-4 md:grid-cols-4">
+      {[
+        ["01", "Fase de grupos", "Elige 1.Âº, 2.Âº y 3.Âº de cada grupo con progreso visible."],
+        ["02", "Bracket dinÃ¡mico", "Genera eliminatorias desde tus grupos y selecciona campeÃ³n."],
+        ["03", "Partidos", "Consulta calendario, marcadores y estados del torneo."],
+        ["04", "Ranking", "Suma puntos y compite en una tabla global de usuarios."],
+      ].map(([step, title, text]) => (
+        <article class="wc-card relative overflow-hidden rounded-3xl p-5">
+          <div class="relative z-10">
+            <p class="font-bebas text-4xl text-yellow-200/90">{step}</p>
+            <h3 class="mt-2 text-base font-black text-white">{title}</h3>
+            <p class="mt-2 text-sm leading-6 text-slate-300">{text}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <section class="grid gap-6 lg:grid-cols-[1.2fr,.8fr]">
+      <div class="wc-shell rounded-[2rem] p-6 md:p-8">
+        <div class="relative z-10">
+          <span class="wc-pill">Experiencia principal</span>
+          <h2 class="mt-4 font-bebas text-5xl text-white md:text-6xl">Tu camino al tÃ­tulo</h2>
+          <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-300 md:text-base">
+            La pÃ¡gina ahora tiene una visiÃ³n mÃ¡s clara: ser una plataforma de predicciones mundialistas. El usuario entra, predice grupos, genera bracket, guarda resultados, consulta partidos y compite en ranking.
+          </p>
+
+          <div class="mt-6 grid gap-3 sm:grid-cols-2">
+            <a href="/grupos" class="group rounded-3xl border border-yellow-300/30 bg-yellow-300/10 p-5 transition hover:-translate-y-1 hover:bg-yellow-300/15">
+              <p class="text-[11px] font-black uppercase tracking-[.18em] text-yellow-200">Inicio recomendado</p>
+              <h3 class="mt-2 text-xl font-black text-white">Predicciones de grupos</h3>
+              <p class="mt-2 text-sm text-slate-300">Completa los 12 grupos y desbloquea la ruta de eliminatorias.</p>
+            </a>
+            <a href="/bracket" class="group rounded-3xl border border-white/10 bg-white/[0.045] p-5 transition hover:-translate-y-1 hover:bg-white/[0.07]">
+              <p class="text-[11px] font-black uppercase tracking-[.18em] text-sky-200">Modo torneo</p>
+              <h3 class="mt-2 text-xl font-black text-white">Bracket interactivo</h3>
+              <p class="mt-2 text-sm text-slate-300">Elige ganadores por ronda y visualiza tu campeÃ³n proyectado.</p>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <aside class="wc-card rounded-[2rem] p-6">
+        <p class="text-[11px] font-black uppercase tracking-[.20em] text-emerald-200">Estado de plataforma</p>
+        <h2 class="mt-2 font-bebas text-4xl text-white">Frontend + </h2>
+        <div class="mt-5 space-y-3">
+          <div class="flex items-center justify-between rounded-2xl bg-white/[0.045] px-4 py-3"><span class="text-sm text-slate-300">API centralizada</span><span class="text-xs font-black text-emerald-200">OK</span></div>
+          <div class="flex items-center justify-between rounded-2xl bg-white/[0.045] px-4 py-3"><span class="text-sm text-slate-300">Auth opcional local</span><span class="text-xs font-black text-emerald-200">OK</span></div>
+          <div class="flex items-center justify-between rounded-2xl bg-white/[0.045] px-4 py-3"><span class="text-sm text-slate-300">Predicciones</span><span class="text-xs font-black text-yellow-200">Conectadas</span></div>
+          <div class="flex items-center justify-between rounded-2xl bg-white/[0.045] px-4 py-3"><span class="text-sm text-slate-300">Admin</span><span class="text-xs font-black text-sky-200">Protegido</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid gap-4 md:grid-cols-3">
+      <a href="/partidos" class="wc-card rounded-3xl p-6 transition hover:-translate-y-1 hover:border-sky-300/30">
+        <p class="text-[11px] font-black uppercase tracking-[.18em] text-sky-200">Calendario</p>
+        <h3 class="mt-2 text-2xl font-black text-white">Partidos y sedes</h3>
+        <p class="mt-2 text-sm leading-6 text-slate-300">Consulta encuentros, fechas, fases y estados desde el backend.</p>
+      </a>
+      <a href="/equipos" class="wc-card rounded-3xl p-6 transition hover:-translate-y-1 hover:border-emerald-300/30">
+        <p class="text-[11px] font-black uppercase tracking-[.18em] text-emerald-200">Selecciones</p>
+        <h3 class="mt-2 text-2xl font-black text-white">Equipos y plantillas</h3>
+        <p class="mt-2 text-sm leading-6 text-slate-300">Explora selecciones, jugadores y detalles Ãºtiles para decidir pronÃ³sticos.</p>
+      </a>
+      <a href="/leaderboard" class="wc-card rounded-3xl p-6 transition hover:-translate-y-1 hover:border-yellow-300/30">
+        <p class="text-[11px] font-black uppercase tracking-[.18em] text-yellow-200">Competencia</p>
+        <h3 class="mt-2 text-2xl font-black text-white">Ranking global</h3>
+        <p class="mt-2 text-sm leading-6 text-slate-300">Mira la tabla de posiciones, puntos, aciertos y marcadores exactos.</p>
+      </a>
+    </section>
+  </section>
+</MainLayout>
+
+
